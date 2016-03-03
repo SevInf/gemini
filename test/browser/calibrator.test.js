@@ -3,7 +3,11 @@ var eachSupportedBrowser = require('./util').eachSupportedBrowser,
     Calibrator = require('../../lib/calibrator');
 
 describe('calibrator', function() {
-    eachSupportedBrowser(function() {
+    eachSupportedBrowser(function(browserId) {
+        if (browserId === 'android4.4') { //In SauseLabs calibration image for android 4.4 is not monocolor.
+            return;
+        }
+
         beforeEach(function() {
             return this.browser.initSession();
         });

@@ -4,8 +4,8 @@ var Config = require('../../lib/config'),
     _ = require('lodash'),
 
     supportedBrowsers = {
-        // evergreen browsers are always tested against latest
-        // version
+        //evergreen browsers are always tested against latest
+        //version
         chrome: {
             browserName: 'chrome'
         },
@@ -105,6 +105,6 @@ function runTestsInBrowser(browserId, callback) {
             this.browser = new Browser(browserConfig);
         });
 
-        callback();
+        callback(browserId);
     });
 }
