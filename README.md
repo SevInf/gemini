@@ -18,8 +18,7 @@ Its key features are:
 
   - Google Chrome (tested in latest version)
   - Mozilla Firefox (tested in latest version)
-  - [IE8+](doc/ie-support.md)
-  - Opera 12+;
+  - [IE9+](doc/ie-support.md)
 
 * Ability to test separate sections of a web page;
 

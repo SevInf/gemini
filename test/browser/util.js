@@ -14,12 +14,6 @@ var Config = require('../../lib/config'),
             browserName: 'firefox'
         },
 
-        // Some specific versions we support
-        ie8: {
-            browserName: 'internet explorer',
-            version: '8'
-        },
-
         ie9: {
             browserName: 'internet explorer',
             version: '9'
@@ -33,11 +27,6 @@ var Config = require('../../lib/config'),
         ie11: {
             browserName: 'internet explorer',
             version: '11'
-        },
-
-        opera12: {
-            browserName: 'opera',
-            version: '12'
         },
 
         'android4.4': {

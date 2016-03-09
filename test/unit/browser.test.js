@@ -100,19 +100,6 @@ describe('browser', function() {
             });
         });
 
-        it('should maximize window if launching phantomjs', function() {
-            var _this = this;
-
-            this.browser = makeBrowser({
-                browserName: 'phantomjs',
-                version: '1.0'
-            }, {calibrate: false});
-
-            return this.launchBrowser().then(function() {
-                assert.called(_this.wd.maximize);
-            });
-        });
-
         describe('with windowSize option', function() {
             beforeEach(function() {
                 this.browser.config.windowSize = {width: 1024, height: 768};
@@ -130,22 +117,6 @@ describe('browser', function() {
                 return this.launchBrowser().then(function() {
                     assert.notCalled(_this.wd.maximize);
                 });
-            });
-
-            it('should not fail if not supported in legacy Opera', function() {
-                this.wd.setWindowSize.returns(q.reject({
-                    cause: {
-                        value: {
-                            message: 'Not supported in OperaDriver yet'
-                        }
-                    }
-                }));
-                return assert.isFulfilled(this.launchBrowser());
-            });
-
-            it('should fail if setWindowSize fails with other error', function() {
-                this.wd.setWindowSize.returns(q.reject(new Error('other')));
-                return assert.isRejected(this.launchBrowser());
             });
         });
     });
@@ -238,7 +209,6 @@ describe('browser', function() {
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
 
             this.browser = makeBrowser({browserName: 'browser', version: '1.0'});
-            this.browser.chooseLocator();
         });
 
         it('should reset mouse position', function() {
@@ -454,62 +424,25 @@ describe('browser', function() {
                 on: sinon.stub()
             };
             this.sinon.stub(wd, 'promiseRemote').returns(this.wd);
-            this.browser = makeBrowser({browserName: 'bro'}, {
-                calibrate: true
-            });
+            this.browser = makeBrowser({browserName: 'bro'});
+            return this.browser.launch();
         });
 
-        describe('when browser supports CSS3 selectors', function() {
-            beforeEach(function() {
-                var calibrator = sinon.createStubInstance(Calibrator);
-                calibrator.calibrate.returns(q({
-                    hasCSS3Selectors: true
-                }));
-                return this.browser.launch(calibrator);
-            });
-
-            it('should return what wd.elementByCssSelector returns', function() {
-                var element = {element: 'elem'};
-                this.wd.elementByCssSelector.withArgs('.class').returns(q(element));
-                return assert.eventually.equal(this.browser.findElement('.class'), element);
-            });
-
-            it('should add a selector property if element is not found', function() {
-                var error = new Error('Element not found');
-                error.status = Browser.ELEMENT_NOT_FOUND;
-                this.wd.elementByCssSelector.returns(q.reject(error));
-
-                return assert.isRejected(this.browser.findElement('.class'))
-                    .then(function(error) {
-                        assert.equal(error.selector, '.class');
-                    });
-            });
+        it('should return what wd.elementByCssSelector returns', function() {
+            var element = {element: 'elem'};
+            this.wd.elementByCssSelector.withArgs('.class').returns(q(element));
+            return assert.eventually.equal(this.browser.findElement('.class'), element);
         });
 
-        describe('when browser does not support CSS3 selectors', function() {
-            beforeEach(function() {
-                this.sinon.stub(ClientBridge.prototype, 'call').returns(q({}));
-                var calibrator = sinon.createStubInstance(Calibrator);
-                calibrator.calibrate.returns(q({
-                    hasCSS3Selectors: false
-                }));
-                return this.browser.launch(calibrator);
-            });
+        it('should add a selector property if element is not found', function() {
+            var error = new Error('Element not found');
+            error.status = Browser.ELEMENT_NOT_FOUND;
+            this.wd.elementByCssSelector.returns(q.reject(error));
 
-            it('should return what client method returns', function() {
-                var element = {element: 'elem'};
-                ClientBridge.prototype.call.withArgs('query.first', ['.class']).returns(q(element));
-                return assert.eventually.equal(this.browser.findElement('.class'), element);
-            });
-
-            it('should reject with element not found error if client method returns null', function() {
-                ClientBridge.prototype.call.returns(q(null));
-                return assert.isRejected(this.browser.findElement('.class'))
-                    .then(function(error) {
-                        assert.equal(error.status, Browser.ELEMENT_NOT_FOUND);
-                        assert.equal(error.selector, '.class');
-                    });
-            });
+            return assert.isRejected(this.browser.findElement('.class'))
+                .then(function(error) {
+                    assert.equal(error.selector, '.class');
+                });
         });
     });
 });
